@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    int n, i, time = 0, remain, q;
+    
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    char pid[n][5];
+    int at[n], bt[n], rt[n], wt[n], tat[n], done[n];
+
+    for(i = 0; i < n; i++) {
+        scanf("%s %d %d", pid[i], &at[i], &bt[i]);
+        rt[i] = bt[i];   // remaining time
+        done[i] = 0;
+    }
+
+    scanf("%d", &q); // time quantum
+
+    remain = n;
+
+    while(remain > 0) {
+        int executed = 0;
+
+        for(i = 0; i < n; i++) {
+            if(rt[i] > 0 && at[i] <= time) {
+                executed = 1;
+
+                if(rt[i] > q) {
+                    time += q;
+                    rt[i] -= q;
+                } else {
+                    time += rt[i];
+                    wt[i] = time - at[i] - bt[i];
+                    tat[i] = time - at[i];
+                    rt[i] = 0;
+                    remain--;
+                }
+            }
+        }
+
+        // If no process executed, move time forward
+        if(!executed) {
+            time++;
+        }
+    }
+
+    float total_wt = 0, total_tat = 0;
+
+    printf("\nWaiting Time:\n");
+    for(i = 0; i < n; i++) {
+        printf("%s %d\n", pid[i], wt[i]);
+        total_wt += wt[i];
+    }
+
+    printf("Turnaround Time:\n");
+    for(i = 0; i < n; i++) {
+        printf("%s %d\n", pid[i], tat[i]);
+        total_tat += tat[i];
+    }
+
+    printf("Average Waiting Time: %.2f\n", total_wt / n);
+    printf("Average Turnaround Time: %.2f\n", total_tat / n);
+
+    return 0;
+}
